@@ -2,9 +2,6 @@
 
 export const revalidate = 0;
 
-
-
-
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';

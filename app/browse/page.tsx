@@ -2,10 +2,6 @@
 
 export const revalidate = 0;
 
-
-
-
-
 import { useState, useEffect } from 'react';
 import NeedCard from '@/components/NeedCard';
 import { api } from '@/lib/api';

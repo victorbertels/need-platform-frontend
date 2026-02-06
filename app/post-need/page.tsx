@@ -2,9 +2,6 @@
 
 export const revalidate = 0;
 
-
-
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';

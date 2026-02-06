@@ -2,10 +2,6 @@
 
 export const revalidate = 0;
 
-
-
-
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
