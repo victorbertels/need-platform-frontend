@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { FiMenu, FiX, FiUser, FiLogOut, FiHome } from 'react-icons/fi';
+import { FiMenu, FiX, FiUser, FiLogOut, FiZap } from 'react-icons/fi';
 import { useAuthStore } from '@/lib/auth';
 
 export default function Navbar() {
@@ -17,26 +17,29 @@ export default function Navbar() {
   const navLinks = [
     { label: 'Browse', href: '/browse' },
     { label: 'How it Works', href: '#features' },
-    { label: 'About', href: '/about' },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+    <nav className="sticky top-0 z-50 bg-slate-900/30 backdrop-blur-2xl border-b border-slate-700/50">
       <div className="container-padding">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-            <FiHome className="text-primary" />
-            <span className="text-primary">Need</span>
+        <div className="flex justify-between items-center h-20">
+          {/* Logo - LARGE AND BOLD */}
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div className="p-2 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl">
+              <FiZap className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent tracking-tight">
+              NEED
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-12">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-slate-300 hover:text-white font-medium transition-colors duration-300 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-300 hover:to-pink-300"
               >
                 {link.label}
               </Link>
@@ -44,30 +47,33 @@ export default function Navbar() {
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-6">
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-6">
                 <Link
                   href={`/profile/${user.id}`}
-                  className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
+                  className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors duration-300 font-medium"
                 >
-                  <FiUser />
-                  {user.full_name || user.username}
+                  <FiUser size={18} />
+                  <span className="hidden lg:inline">{user.full_name || user.username}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors"
+                  className="flex items-center gap-2 text-slate-400 hover:text-pink-400 transition-colors duration-300 font-medium"
                 >
-                  <FiLogOut />
-                  Logout
+                  <FiLogOut size={18} />
+                  <span className="hidden lg:inline">Logout</span>
                 </button>
               </div>
             ) : (
               <>
-                <Link href="/login" className="text-gray-600 hover:text-primary transition-colors font-semibold">
+                <Link 
+                  href="/login" 
+                  className="text-slate-300 hover:text-white transition-colors duration-300 font-semibold"
+                >
                   Login
                 </Link>
-                <Link href="/register" className="btn-primary px-6 py-2">
+                <Link href="/register" className="btn-primary px-6 py-2.5 text-sm">
                   Sign Up
                 </Link>
               </>
@@ -76,43 +82,44 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden"
+            className="md:hidden p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
             {isOpen ? (
-              <FiX className="text-2xl" />
+              <FiX className="text-2xl text-white" />
             ) : (
-              <FiMenu className="text-2xl" />
+              <FiMenu className="text-2xl text-white" />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden pb-4 space-y-4 border-t border-gray-200 pt-4">
+          <div className="md:hidden pb-6 space-y-4 border-t border-slate-700/50 pt-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block text-gray-600 hover:text-primary transition-colors"
+                className="block text-slate-300 hover:text-white transition-colors font-medium"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pt-4 border-t border-gray-200 space-y-2">
+            <div className="pt-6 border-t border-slate-700/50 space-y-3">
               {user ? (
                 <>
                   <Link
                     href={`/profile/${user.id}`}
-                    className="block text-gray-600 hover:text-primary transition-colors"
+                    className="block text-slate-300 hover:text-white transition-colors font-medium"
+                    onClick={() => setIsOpen(false)}
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left text-red-600 hover:text-red-700 transition-colors"
+                    className="block w-full text-left text-pink-400 hover:text-pink-300 transition-colors font-medium"
                   >
                     Logout
                   </button>
@@ -121,13 +128,15 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/login"
-                    className="block text-gray-600 hover:text-primary transition-colors"
+                    className="block text-slate-300 hover:text-white transition-colors font-medium"
+                    onClick={() => setIsOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
-                    className="block btn-primary text-center py-2"
+                    className="block btn-primary text-center py-2.5 font-semibold"
+                    onClick={() => setIsOpen(false)}
                   >
                     Sign Up
                   </Link>
