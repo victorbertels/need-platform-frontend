@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import NeedCard from '@/components/NeedCard';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { FiFilter, FiSearch, FiChevronDown, FiX } from 'react-icons/fi';
+import { FiFilter, FiSearch, FiX } from 'react-icons/fi';
 
 const categories = [
   'All', 'Cleaning', 'Assembly', 'Handyman', 'Moving', 'Gardening', 
