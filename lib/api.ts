@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Router from 'next/router';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -27,13 +26,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If 401, clear auth and redirect (only on client-side)
+    // If 401, clear auth (let components handle redirect)
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // Use Next.js router instead of window.location for SSR safety
-        Router.push('/login');
       }
     }
     return Promise.reject(error);
