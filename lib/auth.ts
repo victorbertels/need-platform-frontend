@@ -56,72 +56,70 @@ export const useAuthStore = create<AuthStore>((set, get) => {
     isLoading: false,
     error: null,
 
-  login: async (username: string, password: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await api.post('/login', { username, password });
-      const { user, token } = response.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      set({ user, token, isLoading: false });
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Login failed';
-      set({ error: errorMessage, isLoading: false });
-      throw error;
-    }
-  },
+    login: async (username: string, password: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await api.post('/login', { username, password });
+        const { user, token } = response.data;
+        
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        set({ user, token, isLoading: false });
+      } catch (error: any) {
+        const errorMessage = error.response?.data?.detail || 'Login failed';
+        set({ error: errorMessage, isLoading: false });
+        throw error;
+      }
+    },
 
-  register: async (data) => {
-    set({ isLoading: true, error: null });
-    try {
-      // Register endpoint now returns { token, token_type, user }
-      const response = await api.post('/register', data);
-      const { token, user } = response.data;
-      
-      // Store token from registration response
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      set({ user, token: token, isLoading: false });
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Registration failed';
-      set({ error: errorMessage, isLoading: false });
-      throw error;
-    }
-  },
+    register: async (data) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await api.post('/register', data);
+        const { token, user } = response.data;
+        
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        set({ user, token: token, isLoading: false });
+      } catch (error: any) {
+        const errorMessage = error.response?.data?.detail || 'Registration failed';
+        set({ error: errorMessage, isLoading: false });
+        throw error;
+      }
+    },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    set({ user: null, token: null });
-  },
-
-  setUser: (user) => {
-    set({ user });
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    }
-  },
-
-  setToken: (token) => {
-    set({ token });
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
+    logout: () => {
       localStorage.removeItem('token');
-    }
-  },
+      localStorage.removeItem('user');
+      set({ user: null, token: null });
+    },
 
-  clearError: () => set({ error: null }),
+    setUser: (user) => {
+      set({ user });
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+    },
 
-  isAuthenticated: () => {
-    return get().token !== null && get().user !== null;
-  },
+    setToken: (token) => {
+      set({ token });
+      if (token) {
+        localStorage.setItem('token', token);
+      } else {
+        localStorage.removeItem('token');
+      }
+    },
 
-  getToken: () => {
-    return get().token;
-  },
-};
-}));
+    clearError: () => set({ error: null }),
+
+    isAuthenticated: () => {
+      return get().token !== null && get().user !== null;
+    },
+
+    getToken: () => {
+      return get().token;
+    },
+  };
+});
