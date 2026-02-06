@@ -70,7 +70,7 @@ export default function DashboardPage() {
       // Calculate stats
       const stats: Stats = {
         posted_needs: needsResponse.data?.length || 0,
-        active_bids: bidsResponse.data?.filter(b => b.status === 'pending')?.length || 0,
+        active_bids: bidsResponse.data?.filter((b: any) => b.status === 'pending')?.length || 0,
         messages_unread: 0, // TODO: Fetch from notifications
         total_earnings: 0 // TODO: Calculate from completed bids
       };
