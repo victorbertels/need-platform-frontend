@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
@@ -50,10 +50,11 @@ export default function PostNeedPage() {
     deadline: '',
   });
 
-  if (!isAuthenticated()) {
-    router.push('/login');
-    return null;
-  }
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
