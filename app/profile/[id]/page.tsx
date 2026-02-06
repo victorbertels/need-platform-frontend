@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import toast from 'react-hot-toast';
-import { FiStar, FiMapPin, FiMail, FiEdit, FiPhone, FiCalendar } from 'react-icons/fi';
+import { FiStar, FiMapPin, FiMail, FiEdit } from 'react-icons/fi';
 import { formatDate } from '@/lib/utils';
 
 interface UserProfile {

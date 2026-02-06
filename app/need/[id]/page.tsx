@@ -8,7 +8,7 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import toast from 'react-hot-toast';
 import { FiMapPin, FiStar, FiMessageCircle, FiCheck, FiX } from 'react-icons/fi';
-import { formatDate, formatCurrency } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 
 interface Need {
   id: string;
