@@ -22,7 +22,7 @@ export default function LoginPage() {
     }
 
     try {
-      await login(username, password.slice(0, 72));
+      await login(username, truncatePasswordToBcryptLimit(password));
       toast.success('Login successful!');
       router.push('/browse');
     } catch (err) {

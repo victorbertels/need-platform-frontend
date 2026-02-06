@@ -56,3 +56,16 @@ export function getInitials(name: string) {
     .join('')
     .toUpperCase();
 }
+
+export function truncatePasswordToBcryptLimit(password: string): string {
+  // Bcrypt has a 72-byte limit, not character limit
+  // UTF-8 characters can be multi-byte, so we need to be careful
+  const encoder = new TextEncoder();
+  let truncated = password;
+  
+  while (encoder.encode(truncated).length > 72) {
+    truncated = truncated.slice(0, -1);
+  }
+  
+  return truncated;
+}

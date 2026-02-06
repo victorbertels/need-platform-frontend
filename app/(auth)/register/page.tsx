@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/auth';
-import { validateEmail, validatePassword } from '@/lib/utils';
+import { validateEmail, validatePassword, truncatePasswordToBcryptLimit } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { FiMail, FiLock, FiUser, FiAlertCircle, FiCheck } from 'react-icons/fi';
 
@@ -74,7 +74,7 @@ export default function RegisterPage() {
         full_name: formData.full_name,
         email: formData.email,
         username: formData.username,
-        password: formData.password.slice(0, 72), // Bcrypt limit: 72 bytes
+        password: truncatePasswordToBcryptLimit(formData.password),
       });
       toast.success('Account created successfully!');
       router.push('/browse');
