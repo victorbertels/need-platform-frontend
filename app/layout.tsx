@@ -21,7 +21,7 @@ export default function RootLayout({
         <meta charSet="utf-8" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="flex flex-col min-h-screen">
+      <body className="flex flex-col min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
         <Navbar />
         <main className="flex-grow">
           {children}
@@ -34,9 +34,10 @@ export default function RootLayout({
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#111827',
+              background: '#1e293b',
               color: '#fff',
-              borderRadius: '8px',
+              borderRadius: '16px',
+              border: '1px solid #334155',
             },
           }}
         />

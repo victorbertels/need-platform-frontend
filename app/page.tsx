@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FiArrowRight, FiCheck, FiLock, FiStar, FiUsers } from 'react-icons/fi';
+import { FiArrowRight, FiCheck, FiZap, FiShield, FiTrendingUp } from 'react-icons/fi';
 
 export default function Home() {
   const router = useRouter();
@@ -16,153 +16,174 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-amber-100">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent">
-            Need
-          </div>
-          <div className="flex gap-4">
-            <Link
-              href="/login"
-              className="px-6 py-2.5 text-amber-900 font-medium hover:bg-amber-50 rounded-lg transition"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/register"
-              className="px-6 py-2.5 bg-gradient-to-r from-amber-700 to-yellow-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-amber-400/30 transition transform hover:scale-105"
-            >
-              Sign Up Free
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 right-1/3 w-72 h-72 bg-cyan-600/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+      </div>
 
-      {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-4 py-24">
-        <div className="grid md:grid-cols-2 gap-12 items-center mb-24">
-          <div>
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight text-gray-900 mb-6">
-              Get Tasks Done.
-              <span className="block bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent">
-                Pay What It's Worth.
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Connect with skilled professionals who deliver excellence. Fair prices. Real results. No middleman.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="px-6 py-3 rounded-lg border-2 border-amber-200 focus:border-amber-700 focus:outline-none transition text-gray-900 flex-1"
-              />
-              <button
-                onClick={handleSignup}
-                className="px-8 py-3 bg-gradient-to-r from-amber-700 to-yellow-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-amber-400/40 transition transform hover:scale-105 flex items-center gap-2 whitespace-nowrap"
-              >
-                Get Started <FiArrowRight size={20} />
-              </button>
-            </div>
-            <p className="text-sm text-gray-500">✓ Free to sign up • No credit card required</p>
-          </div>
-          
-          {/* Hero Image Placeholder */}
-          <div className="bg-gradient-to-br from-amber-100 to-yellow-50 rounded-2xl h-96 flex items-center justify-center border-2 border-amber-200">
-            <div className="text-center">
-              <div className="text-6xl mb-4">🏆</div>
-              <p className="text-amber-900 font-semibold">Premium Services</p>
-              <p className="text-amber-700 text-sm">Fair Pricing</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-8 mb-24 py-12 border-y border-amber-100">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-amber-700 mb-2">28+</div>
-            <p className="text-gray-600">Active Users</p>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-amber-700 mb-2">12+</div>
-            <p className="text-gray-600">Needs Posted</p>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-amber-700 mb-2">100%</div>
-            <p className="text-gray-600">Secure Payments</p>
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="mb-24">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">How It Works</h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { icon: FiUsers, title: 'Post a Need', desc: 'Describe what you need done' },
-              { icon: FiStar, title: 'Get Bids', desc: 'Receive offers from pros' },
-              { icon: FiCheck, title: 'Choose Winner', desc: 'Pick the best match' },
-              { icon: FiLock, title: 'Secure Payment', desc: 'Pay when work is done' }
-            ].map((step, i) => {
-              const Icon = step.icon;
-              return (
-                <div key={i} className="bg-white p-8 rounded-xl border-2 border-amber-100 hover:border-amber-300 hover:shadow-lg transition">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-700 to-yellow-600 rounded-lg flex items-center justify-center mb-4">
-                    <Icon size={24} className="text-white" />
-                  </div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">{step.title}</h3>
-                  <p className="text-gray-600 text-sm">{step.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Testimonials */}
-        <div className="mb-24 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl p-12 border-2 border-amber-200">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">Trusted by Professionals</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { name: 'Sarah K.', role: 'Home Owner', quote: 'Found amazing painters in minutes. Work was flawless.' },
-              { name: 'Marco D.', role: 'Freelancer', quote: 'Most reliable platform. Fair bidding process. Repeat clients.' },
-              { name: 'Lisa M.', role: 'Business Owner', quote: 'Saved us thousands. Quality professionals, transparent pricing.' }
-            ].map((testimonial, i) => (
-              <div key={i} className="bg-white p-8 rounded-xl border-2 border-amber-100">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <FiStar key={j} size={18} className="fill-yellow-500 text-yellow-500" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4 italic">"{testimonial.quote}"</p>
-                <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                <p className="text-sm text-gray-600">{testimonial.role}</p>
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <section className="min-h-screen flex items-center justify-center pt-20 pb-20">
+          <div className="container-padding max-w-7xl mx-auto">
+            <div className="text-center mb-12 animate-fadeIn">
+              <div className="mb-8 inline-block">
+                <span className="px-6 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-full text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                  🚀 The Future of Services
+                </span>
               </div>
-            ))}
+
+              <h1 className="hero-heading mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-cyan-300 text-transparent bg-clip-text">
+                Whatever You Need,
+                <br />
+                We've Got It.
+              </h1>
+
+              <p className="hero-subheading mb-12 max-w-3xl mx-auto">
+                Post a task. Get bids from top professionals. Choose the best. Done. 
+                <br className="hidden md:block" />
+                No middleman. Just real work. Fair prices.
+              </p>
+
+              {/* CTA Section */}
+              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSignup()}
+                  className="input-base flex-1"
+                />
+                <button
+                  onClick={handleSignup}
+                  className="btn-primary whitespace-nowrap flex items-center justify-center gap-2"
+                >
+                  Get Started <FiArrowRight size={20} />
+                </button>
+              </div>
+
+              <p className="text-slate-400 text-sm">
+                ✓ Free to sign up • No credit card required • Join 500+ professionals
+              </p>
+            </div>
+
+            {/* Hero Image */}
+            <div className="mt-20 max-w-4xl mx-auto">
+              <div className="card-gradient hover:border-pink-500/50">
+                <div className="aspect-video bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-2xl flex items-center justify-center border border-purple-500/30">
+                  <div className="text-center">
+                    <div className="text-7xl mb-4 animate-pulse">✨</div>
+                    <p className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                      Get Premium Services
+                    </p>
+                    <p className="text-slate-400 mt-2">Fair Prices • Fast Results</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-32 relative">
+          <div className="container-padding max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                  Why Choose Need?
+                </span>
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: <FiZap className="w-8 h-8" />,
+                  title: 'Lightning Fast',
+                  description: 'Post a task and get bids within minutes. Real people solving real problems.',
+                },
+                {
+                  icon: <FiTrendingUp className="w-8 h-8" />,
+                  title: 'Best Value',
+                  description: 'Competitive pricing. No hidden fees. You pay only what you agree on.',
+                },
+                {
+                  icon: <FiShield className="w-8 h-8" />,
+                  title: 'Secure & Safe',
+                  description: 'Verified professionals. Secure payments. Dispute resolution you can trust.',
+                },
+              ].map((feature, idx) => (
+                <div key={idx} className="card hover:border-purple-500/50 hover:-translate-y-2 group cursor-default">
+                  <div className="mb-6 inline-block p-4 bg-gradient-to-br from-purple-600/30 to-pink-600/20 rounded-2xl group-hover:from-purple-600/50 group-hover:to-pink-600/40 transition">
+                    <div className="text-gradient">{feature.icon}</div>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
+                  <p className="text-slate-400 leading-relaxed">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works */}
+        <section className="py-32 relative">
+          <div className="container-padding max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
+                  Simple as 1, 2, 3
+                </span>
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-12">
+              {[
+                { num: '01', title: 'Post a Need', desc: 'Describe what you need. Set your budget. It only takes 2 minutes.' },
+                { num: '02', title: 'Get Bids', desc: 'Pros bid on your task. Read reviews. Choose the best match.' },
+                { num: '03', title: 'Get It Done', desc: 'Discuss details. Secure payment. Watch the magic happen.' },
+              ].map((step, idx) => (
+                <div key={idx} className="relative">
+                  <div className="card">
+                    <div className="text-7xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent opacity-20">
+                      {step.num}
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3">{step.title}</h3>
+                    <p className="text-slate-400">{step.desc}</p>
+                  </div>
+                  {idx < 2 && <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform -translate-y-1/2"></div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* CTA Section */}
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-gray-600 mb-8">Join thousands of satisfied users. No credit card required.</p>
-          <Link
-            href="/register"
-            className="inline-block px-10 py-4 bg-gradient-to-r from-amber-700 to-yellow-600 text-white font-bold text-lg rounded-lg hover:shadow-xl hover:shadow-amber-400/40 transition transform hover:scale-105"
-          >
-            Sign Up for Free <FiArrowRight className="inline ml-2" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="mt-24 bg-gray-900 text-white py-12">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-gray-400">© 2026 Need Platform. Connecting people who need help with people who can help.</p>
-        </div>
-      </footer>
+        <section className="py-32 relative">
+          <div className="container-padding max-w-4xl mx-auto">
+            <div className="card-gradient text-center">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-cyan-300">
+                  Ready to Get Started?
+                </span>
+              </h2>
+              <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+                Join thousands of professionals and customers getting amazing work done. Sign up today—it's free.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/register" className="btn-primary">
+                  Sign Up Now <FiArrowRight size={20} />
+                </Link>
+                <Link href="/browse" className="btn-secondary">
+                  Browse Services
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
