@@ -1,18 +1,16 @@
 'use client';
 
-
-
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import toast from 'react-hot-toast';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiAlertCircle } from 'react-icons/fi';
 
 const categories = [
-  'House Cleaning',
-  'Furniture Assembly',
+  'Cleaning',
+  'Assembly',
   'Handyman',
   'Moving',
   'Gardening',
@@ -23,6 +21,7 @@ const categories = [
   'Tutoring',
   'Pet Care',
   'Delivery',
+  'Other',
 ];
 
 const locations = [
@@ -34,7 +33,10 @@ const locations = [
   'Namur',
   'Mons',
   'Tournai',
+  'Online',
 ];
+
+const MINIMUM_BUDGET = 20;
 
 export default function PostNeedPage() {
   const router = useRouter();
@@ -43,9 +45,9 @@ export default function PostNeedPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '',
+    category: categories[0],
     budget: '',
-    location: '',
+    location: locations[0],
     deadline: '',
   });
 
@@ -55,11 +57,13 @@ export default function PostNeedPage() {
     }
   }, [isAuthenticated, router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -67,13 +71,29 @@ export default function PostNeedPage() {
     e.preventDefault();
 
     // Validation
-    if (!formData.title || !formData.description || !formData.category || !formData.budget || !formData.location) {
-      toast.error('Please fill in all required fields');
+    if (!formData.title.trim()) {
+      toast.error('Please enter a task title');
       return;
     }
 
-    if (parseFloat(formData.budget) <= 0) {
-      toast.error('Budget must be greater than 0');
+    if (formData.title.length < 5) {
+      toast.error('Title must be at least 5 characters');
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      toast.error('Please describe what you need');
+      return;
+    }
+
+    if (formData.description.length < 20) {
+      toast.error('Description must be at least 20 characters');
+      return;
+    }
+
+    const budget = parseFloat(formData.budget);
+    if (!formData.budget || isNaN(budget) || budget < MINIMUM_BUDGET) {
+      toast.error(`Budget must be at least €${MINIMUM_BUDGET}`);
       return;
     }
 
@@ -83,185 +103,228 @@ export default function PostNeedPage() {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        budget: parseFloat(formData.budget),
+        starting_bid: budget,
         location: formData.location,
         deadline: formData.deadline || null,
+        status: 'Active',
       });
 
-      toast.success('Need posted successfully!');
-      router.push(`/need/${response.data.id}`);
+      toast.success('Need posted successfully! 🎉');
+      router.push('/my-needs');
     } catch (error: any) {
-      console.error('Error posting need:', error);
       toast.error(error.response?.data?.detail || 'Failed to post need');
     } finally {
       setLoading(false);
     }
   };
 
+  if (!isAuthenticated()) {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container-padding">
-        <div className="max-w-2xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <button
-              onClick={() => router.back()}
-              className="btn-secondary p-2 rounded-full"
-            >
-              <FiArrowLeft />
-            </button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Post a Need</h1>
-              <p className="text-gray-600 mt-1">Describe what you need help with</p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-slate-900/30 backdrop-blur-2xl border-b border-slate-700/50">
+        <div className="container-padding max-w-4xl mx-auto py-6">
+          <Link
+            href="/my-needs"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-purple-300 transition mb-4"
+          >
+            <FiArrowLeft /> Back
+          </Link>
+          <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+            Post a Need
+          </h1>
+          <p className="text-slate-400 mt-2">Describe what you need done and get bids from professionals</p>
+        </div>
+      </div>
 
+      {/* Main Content */}
+      <div className="container-padding max-w-4xl mx-auto py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Title */}
-            <div className="card">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-900 mb-2">
-                Need Title *
-              </label>
-              <input
-                id="title"
-                name="title"
-                type="text"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="e.g., Repaint my bedroom"
-                className="input-base"
-                required
-              />
-              <p className="text-gray-500 text-sm mt-1">Be specific about what you need</p>
-            </div>
-
-            {/* Description */}
-            <div className="card">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-900 mb-2">
-                Description *
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Provide details about what needs to be done..."
-                rows={6}
-                className="input-base"
-                required
-              />
-              <p className="text-gray-500 text-sm mt-1">Include any specific requirements or preferences</p>
-            </div>
-
-            {/* Two Column Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Category */}
-              <div className="card">
-                <label htmlFor="category" className="block text-sm font-medium text-gray-900 mb-2">
-                  Category *
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="input-base"
-                  required
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Location */}
-              <div className="card">
-                <label htmlFor="location" className="block text-sm font-medium text-gray-900 mb-2">
-                  Location *
-                </label>
-                <select
-                  id="location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  className="input-base"
-                  required
-                >
-                  <option value="">Select a location</option>
-                  {locations.map(loc => (
-                    <option key={loc} value={loc}>{loc}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Budget */}
-              <div className="card">
-                <label htmlFor="budget" className="block text-sm font-medium text-gray-900 mb-2">
-                  Budget (€) *
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-bold text-white mb-3">
+                  Task Title <span className="text-pink-400">*</span>
                 </label>
                 <input
-                  id="budget"
-                  name="budget"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.budget}
+                  type="text"
+                  name="title"
+                  value={formData.title}
                   onChange={handleChange}
-                  placeholder="0.00"
-                  className="input-base"
-                  required
+                  placeholder="e.g. Clean my apartment, Fix broken door, etc."
+                  className="input-base w-full"
+                  maxLength={100}
                 />
-                <p className="text-gray-500 text-sm mt-1">Estimated budget for this task</p>
+                <p className="text-xs text-slate-400 mt-2">
+                  {formData.title.length}/100 characters
+                </p>
               </div>
 
-              {/* Deadline */}
-              <div className="card">
-                <label htmlFor="deadline" className="block text-sm font-medium text-gray-900 mb-2">
-                  Deadline (Optional)
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-bold text-white mb-3">
+                  Description <span className="text-pink-400">*</span>
                 </label>
-                <input
-                  id="deadline"
-                  name="deadline"
-                  type="date"
-                  value={formData.deadline}
+                <textarea
+                  name="description"
+                  value={formData.description}
                   onChange={handleChange}
-                  className="input-base"
+                  placeholder="Provide details about what needs to be done, any specific requirements, timeline, etc."
+                  className="input-base w-full min-h-32 resize-none"
+                  maxLength={1000}
                 />
+                <p className="text-xs text-slate-400 mt-2">
+                  {formData.description.length}/1000 characters
+                </p>
               </div>
-            </div>
 
-            {/* Tips */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <h3 className="font-semibold text-blue-900 mb-3">Tips for posting</h3>
-              <ul className="text-sm text-blue-800 space-y-2">
-                <li>✓ Be clear and specific about what you need</li>
-                <li>✓ Provide realistic budget expectations</li>
-                <li>✓ Include any deadlines or time constraints</li>
-                <li>✓ Mention if you have any specific requirements</li>
-              </ul>
-            </div>
+              {/* Category & Location */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-white mb-3">
+                    Category <span className="text-pink-400">*</span>
+                  </label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="input-base w-full"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Actions */}
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="btn-secondary flex-1 py-3"
-                disabled={loading}
-              >
-                Cancel
-              </button>
+                <div>
+                  <label className="block text-sm font-bold text-white mb-3">
+                    Location <span className="text-pink-400">*</span>
+                  </label>
+                  <select
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="input-base w-full"
+                  >
+                    {locations.map((loc) => (
+                      <option key={loc} value={loc}>
+                        {loc}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Budget & Deadline */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-white mb-3">
+                    Budget <span className="text-pink-400">*</span>
+                    <span className="text-xs text-slate-400 font-normal ml-2">
+                      (minimum €{MINIMUM_BUDGET})
+                    </span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">
+                      €
+                    </span>
+                    <input
+                      type="number"
+                      name="budget"
+                      value={formData.budget}
+                      onChange={handleChange}
+                      placeholder={String(MINIMUM_BUDGET)}
+                      min={MINIMUM_BUDGET}
+                      step="0.01"
+                      className="input-base w-full pl-8"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-white mb-3">
+                    Deadline <span className="text-slate-500 font-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="deadline"
+                    value={formData.deadline}
+                    onChange={handleChange}
+                    className="input-base w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="btn-primary flex-1 py-3"
                 disabled={loading}
+                className="btn-primary w-full py-4 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {loading ? 'Posting...' : 'Post Need'}
+                {loading ? (
+                  <>
+                    <div className="animate-spin">⏳</div>
+                    Posting...
+                  </>
+                ) : (
+                  <>
+                    <FiCheck /> Post Need
+                  </>
+                )}
               </button>
+            </form>
+          </div>
+
+          {/* Sidebar Info */}
+          <div className="lg:col-span-1">
+            <div className="card sticky top-32 space-y-6">
+              <div>
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                  <FiAlertCircle className="text-cyan-400" />
+                  Tips
+                </h3>
+                <div className="space-y-3 text-sm text-slate-300">
+                  <div>
+                    <p className="font-semibold text-white mb-1">✓ Be Specific</p>
+                    <p>
+                      The more details you provide, the better bids you'll receive from professionals.
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white mb-1">💰 Fair Budget</p>
+                    <p>
+                      Set a realistic budget. Higher budgets attract more qualified professionals.
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white mb-1">⏰ Set Deadlines</p>
+                    <p>
+                      Add a deadline to create urgency and help professionals plan their schedules.
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white mb-1">⭐ Quality Matters</p>
+                    <p>
+                      Choose professionals with good ratings and reviews, not just the cheapest bid.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-700/50 pt-6">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  By posting, you agree to our Terms of Service. Platform fee: 5% of final contract value.
+                </p>
+              </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

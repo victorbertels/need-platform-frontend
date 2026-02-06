@@ -2,225 +2,264 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import toast from 'react-hot-toast';
-import { FiEdit, FiTrash2, FiEye } from 'react-icons/fi';
-import NeedCard from '@/components/NeedCard';
-import { formatDate } from '@/lib/utils';
+import { FiPlus, FiEdit, FiTrash2, FiMessageSquare, FiCheck, FiClock, FiAlertCircle } from 'react-icons/fi';
 
 interface Need {
   id: string;
   title: string;
   description: string;
   category: string;
-  budget: number;
   location: string;
+  starting_bid?: number;
   status: string;
-  created_at: string;
-  bid_count?: number;
-  image_url?: string;
+  bids?: any[];
+  created_at?: string;
+  auction_end?: string;
 }
 
+const statusColors: Record<string, string> = {
+  Active: 'bg-green-500/20 text-green-300 border-green-500/30',
+  Completed: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+  Cancelled: 'bg-red-500/20 text-red-300 border-red-500/30',
+};
+
+const statusIcons: Record<string, JSX.Element> = {
+  Active: <FiClock className="w-4 h-4" />,
+  Completed: <FiCheck className="w-4 h-4" />,
+  Cancelled: <FiAlertCircle className="w-4 h-4" />,
+};
+
 export default function MyNeedsPage() {
-  const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [needs, setNeeds] = useState<Need[]>([]);
+  const [filteredNeeds, setFilteredNeeds] = useState<Need[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filter, setFilter] = useState<'all' | 'open' | 'in_progress' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [sort, setSort] = useState<'newest' | 'oldest' | 'budget-high' | 'budget-low'>('newest');
+  const [deleting, setDeleting] = useState<string | null>(null);
 
+  // Fetch needs
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
-    fetchMyNeeds();
-  }, []);
+    const fetchNeeds = async () => {
+      try {
+        const response = await api.get('/users/me/needs');
+        setNeeds(response.data || []);
+      } catch (error: any) {
+        toast.error('Failed to load your needs');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchMyNeeds = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/users/me/needs');
-      setNeeds(response.data || []);
-    } catch (error) {
-      console.error('Error fetching needs:', error);
-      toast.error('Failed to load your needs');
-    } finally {
-      setLoading(false);
+    if (isAuthenticated()) {
+      fetchNeeds();
     }
-  };
+  }, [isAuthenticated]);
+
+  // Filter and sort
+  useEffect(() => {
+    let filtered = needs;
+
+    // Filter by status
+    if (filter === 'active') {
+      filtered = filtered.filter((n) => n.status === 'Active');
+    } else if (filter === 'completed') {
+      filtered = filtered.filter((n) => n.status === 'Completed');
+    }
+
+    // Sort
+    if (sort === 'newest') {
+      filtered.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+    } else if (sort === 'oldest') {
+      filtered.sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
+    } else if (sort === 'budget-high') {
+      filtered.sort((a, b) => (b.starting_bid || 0) - (a.starting_bid || 0));
+    } else if (sort === 'budget-low') {
+      filtered.sort((a, b) => (a.starting_bid || 0) - (b.starting_bid || 0));
+    }
+
+    setFilteredNeeds(filtered);
+  }, [needs, filter, sort]);
 
   const handleDelete = async (needId: string) => {
-    if (!window.confirm('Are you sure you want to delete this need?')) return;
+    if (!confirm('Are you sure you want to delete this need? This cannot be undone.')) {
+      return;
+    }
 
     try {
+      setDeleting(needId);
       await api.delete(`/needs/${needId}`);
+      setNeeds((prev) => prev.filter((n) => n.id !== needId));
       toast.success('Need deleted successfully');
-      fetchMyNeeds();
-    } catch (error) {
-      console.error('Error deleting need:', error);
-      toast.error('Failed to delete need');
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Failed to delete need');
+    } finally {
+      setDeleting(null);
     }
   };
 
-  const filteredNeeds = needs.filter(need => {
-    if (filter === 'all') return true;
-    return need.status === filter;
-  });
+  if (!isAuthenticated()) {
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container-padding">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-slate-900/30 backdrop-blur-2xl border-b border-slate-700/50">
+        <div className="container-padding max-w-7xl mx-auto py-6">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Posted Needs</h1>
-              <p className="text-gray-600 mt-1">{filteredNeeds.length} needs</p>
+              <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                My Needs
+              </h1>
+              <p className="text-slate-400 mt-2">Manage your posted tasks and view bids</p>
             </div>
-            <Link href="/post-need" className="btn-primary">
-              + Post New Need
+            <Link
+              href="/post-need"
+              className="btn-primary flex items-center gap-2 whitespace-nowrap"
+            >
+              <FiPlus /> Post New Need
             </Link>
           </div>
 
-          {/* Controls */}
-          <div className="flex gap-4 mb-8 flex-wrap">
-            {/* Filter */}
+          {/* Filters & Sort */}
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex gap-2">
-              {(['all', 'open', 'in_progress', 'completed'] as const).map((f) => (
+              {(['all', 'active', 'completed'] as const).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg font-semibold transition ${
                     filter === f
-                      ? 'bg-primary text-white'
-                      : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                      : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/50'
                   }`}
                 >
-                  {f === 'in_progress' ? 'In Progress' : f.charAt(0).toUpperCase() + f.slice(1)}
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
                 </button>
               ))}
             </div>
 
-            {/* View Mode */}
-            <div className="ml-auto flex gap-2">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-lg ${
-                  viewMode === 'grid'
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-200 text-gray-900'
-                }`}
-              >
-                Grid
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-lg ${
-                  viewMode === 'list'
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-200 text-gray-900'
-                }`}
-              >
-                List
-              </button>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as any)}
+              className="input-base px-4 py-2 h-10"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="budget-high">Budget: High to Low</option>
+              <option value="budget-low">Budget: Low to High</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="container-padding max-w-7xl mx-auto py-12">
+        {loading ? (
+          <div className="flex items-center justify-center min-h-64">
+            <div className="animate-spin">
+              <div className="w-12 h-12 border-4 border-slate-700 border-t-purple-500 rounded-full"></div>
             </div>
           </div>
-
-          {/* Content */}
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading your needs...</p>
-            </div>
-          ) : filteredNeeds.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600 mb-4">No needs found</p>
-              <Link href="/post-need" className="btn-primary">
-                Post Your First Need
-              </Link>
-            </div>
-          ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredNeeds.map((need) => (
-                <div key={need.id} className="relative">
-                  <NeedCard need={need} />
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    <Link
-                      href={`/need/${need.id}`}
-                      className="btn-secondary w-10 h-10 flex items-center justify-center rounded-full"
-                      title="View need"
-                    >
-                      <FiEye size={16} />
-                    </Link>
-                    <Link
-                      href={`/need/${need.id}/edit`}
-                      className="btn-secondary w-10 h-10 flex items-center justify-center rounded-full"
-                      title="Edit need"
-                    >
-                      <FiEdit size={16} />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(need.id)}
-                      className="btn-secondary w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-100"
-                      title="Delete need"
-                    >
-                      <FiTrash2 size={16} className="text-red-600" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredNeeds.map((need) => (
-                <div key={need.id} className="card flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 mb-2">{need.title}</h3>
-                    <div className="flex gap-4 text-sm text-gray-600 mb-2">
-                      <span>{need.category}</span>
-                      <span>{need.location}</span>
-                      <span>€{need.budget}</span>
-                      <span className={`font-semibold ${
-                        need.status === 'open'
-                          ? 'text-green-600'
-                          : need.status === 'in_progress'
-                          ? 'text-blue-600'
-                          : 'text-gray-600'
-                      }`}>
-                        {need.status === 'in_progress' ? 'In Progress' : need.status}
+        ) : filteredNeeds.length > 0 ? (
+          <div className="space-y-6">
+            {filteredNeeds.map((need) => (
+              <div key={need.id} className="card hover:border-purple-500/50 transition group">
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-2xl font-bold text-white truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-300 group-hover:to-pink-300 transition">
+                          {need.title}
+                        </h3>
+                        <p className="text-sm text-slate-400 mt-1">
+                          {need.category} • {need.location}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-4 py-2 rounded-lg border text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
+                          statusColors[need.status] || statusColors.Active
+                        }`}
+                      >
+                        {statusIcons[need.status]}
+                        {need.status}
                       </span>
                     </div>
-                    <p className="text-gray-500 text-xs">
-                      Posted {formatDate(need.created_at)} • {need.bid_count || 0} bids
-                    </p>
+
+                    <p className="text-slate-300 line-clamp-2 mb-4">{need.description}</p>
+
+                    {/* Stats */}
+                    <div className="flex flex-wrap gap-6 text-sm">
+                      <div>
+                        <p className="text-slate-400">Budget</p>
+                        <p className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                          €{need.starting_bid || 0}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-slate-400">Bids Received</p>
+                        <p className="text-xl font-bold text-cyan-300">{need.bids?.length || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-400">Posted</p>
+                        <p className="text-sm text-slate-300">
+                          {need.created_at
+                            ? new Date(need.created_at).toLocaleDateString()
+                            : 'Recently'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
+
+                  {/* Actions */}
+                  <div className="flex gap-3 lg:flex-col justify-end">
                     <Link
                       href={`/need/${need.id}`}
-                      className="btn-secondary px-3 py-2 flex items-center gap-2 text-sm"
+                      className="btn-secondary px-4 py-2 flex items-center justify-center gap-2 text-sm whitespace-nowrap"
                     >
-                      <FiEye size={14} /> View
+                      <FiMessageSquare className="w-4 h-4" /> View Bids
                     </Link>
-                    <Link
-                      href={`/need/${need.id}/edit`}
-                      className="btn-secondary px-3 py-2 flex items-center gap-2 text-sm"
-                    >
-                      <FiEdit size={14} /> Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(need.id)}
-                      className="btn-secondary px-3 py-2 text-red-600 hover:bg-red-50"
-                    >
-                      <FiTrash2 size={14} />
-                    </button>
+                    {need.status === 'Active' && (
+                      <>
+                        <Link
+                          href={`/need/${need.id}/edit`}
+                          className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl transition flex items-center justify-center gap-2 text-sm"
+                        >
+                          <FiEdit className="w-4 h-4" /> Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(need.id)}
+                          disabled={deleting === need.id}
+                          className="bg-red-900/30 hover:bg-red-900/50 text-red-300 px-4 py-2 rounded-xl transition flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+                        >
+                          <FiTrash2 className="w-4 h-4" /> Delete
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="card text-center py-16">
+            <div className="text-6xl mb-6">📋</div>
+            <h3 className="text-3xl font-bold text-white mb-3">No Needs Yet</h3>
+            <p className="text-slate-400 mb-8 text-lg max-w-md mx-auto">
+              {filter === 'all'
+                ? "You haven't posted any needs yet. Create one to start receiving bids from professionals."
+                : `No ${filter} needs found.`}
+            </p>
+            <Link href="/post-need" className="btn-primary inline-flex items-center gap-2">
+              <FiPlus /> Post Your First Need
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
