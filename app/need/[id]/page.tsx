@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import toast from 'react-hot-toast';
-import { FiMapPin, FiStar, FiDollarSign, FiMessageCircle, FiCheck, FiX, FiClock } from 'react-icons/fi';
+import { FiMapPin, FiStar, FiMessageCircle, FiCheck, FiX, FiClock } from 'react-icons/fi';
 import { formatDate, formatCurrency } from '@/lib/utils';
 
 interface Need {
