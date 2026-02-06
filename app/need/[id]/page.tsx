@@ -43,7 +43,7 @@ interface Bid {
 
 export default function NeedDetailPage() {
   const params = useParams();
-  const { user, getToken } = useAuthStore();
+  const { user } = useAuthStore();
   const [need, setNeed] = useState<Need | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
