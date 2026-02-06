@@ -1,6 +1,5 @@
 'use client';
 
-export const revalidate = 0;
 
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
