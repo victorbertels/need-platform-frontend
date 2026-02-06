@@ -36,15 +36,25 @@ interface AuthStore {
   getToken: () => string | null;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
-  user: typeof window !== 'undefined' 
-    ? JSON.parse(localStorage.getItem('user') || 'null')
-    : null,
-  token: typeof window !== 'undefined'
-    ? localStorage.getItem('token')
-    : null,
-  isLoading: false,
-  error: null,
+export const useAuthStore = create<AuthStore>((set, get) => {
+  // Initialize safely - only on client side
+  let initialUser = null;
+  let initialToken = null;
+  
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    try {
+      initialUser = JSON.parse(localStorage.getItem('user') || 'null');
+      initialToken = localStorage.getItem('token');
+    } catch (e) {
+      // Silent fail on SSR
+    }
+  }
+  
+  return {
+    user: initialUser,
+    token: initialToken,
+    isLoading: false,
+    error: null,
 
   login: async (username: string, password: string) => {
     set({ isLoading: true, error: null });
@@ -113,4 +123,5 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   getToken: () => {
     return get().token;
   },
+  };
 }));
