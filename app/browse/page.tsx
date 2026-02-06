@@ -1,13 +1,13 @@
 'use client';
 
-
-
-
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import NeedCard from '@/components/NeedCard';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
-import { FiFilter, FiSearch, FiX } from 'react-icons/fi';
+import { FiFilter, FiSearch, FiX, FiMap, FiGrid3X3 } from 'react-icons/fi';
+
+const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
 const categories = [
   'All', 'Cleaning', 'Assembly', 'Handyman', 'Moving', 'Gardening', 
@@ -29,10 +29,15 @@ interface Need {
   description: string;
   category: string;
   location: string;
-  starting_bid: number;
+  budget?: number;
+  starting_bid?: number;
   auction_end: string;
   status: string;
-  bids: any[];
+  bids?: any[];
+  latitude?: number;
+  longitude?: number;
+  image_url?: string;
+  rating?: number;
 }
 
 export default function Browse() {
@@ -44,15 +49,24 @@ export default function Browse() {
   const [selectedLocation, setSelectedLocation] = useState('All');
   const [selectedSort, setSelectedSort] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
+  const [isMapView, setIsMapView] = useState(false);
 
   // Fetch needs
   useEffect(() => {
     const fetchNeeds = async () => {
       try {
         const response = await api.get('/needs');
-        const activeNeeds = response.data.filter((n: Need) => n.status === 'Active');
-        setNeeds(activeNeeds);
-        setFilteredNeeds(activeNeeds);
+        const activeNeeds = response.data.filter((n: Need) => n.status === 'Active' || n.status === 'pending');
+        
+        // Add mock locations if not present
+        const needsWithLocations = activeNeeds.map((need: Need) => ({
+          ...need,
+          latitude: need.latitude || 50.5 + Math.random() * 0.5,
+          longitude: need.longitude || 4.47 + Math.random() * 0.5,
+        }));
+        
+        setNeeds(needsWithLocations);
+        setFilteredNeeds(needsWithLocations);
       } catch (error: any) {
         toast.error('Failed to load needs');
       } finally {
@@ -86,9 +100,9 @@ export default function Browse() {
 
     // Sorting
     if (selectedSort === 'budget-low') {
-      filtered.sort((a, b) => a.starting_bid - b.starting_bid);
+      filtered.sort((a, b) => (a.starting_bid || 0) - (b.starting_bid || 0));
     } else if (selectedSort === 'budget-high') {
-      filtered.sort((a, b) => b.starting_bid - a.starting_bid);
+      filtered.sort((a, b) => (b.starting_bid || 0) - (a.starting_bid || 0));
     } else if (selectedSort === 'newest') {
       filtered.sort((a, b) => new Date(b.auction_end).getTime() - new Date(a.auction_end).getTime());
     }
@@ -96,53 +110,89 @@ export default function Browse() {
     setFilteredNeeds(filtered);
   }, [needs, searchTerm, selectedCategory, selectedLocation, selectedSort]);
 
+  if (isMapView) {
+    return (
+      <>
+        <MapView
+          needs={filteredNeeds}
+          isMapView={isMapView}
+          onToggleView={() => setIsMapView(false)}
+          selectedCategory={selectedCategory}
+        />
+      </>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-warm-white via-white to-cream">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       {/* Header */}
-      <div className="bg-white border-b border-amber-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="sticky top-0 z-40 bg-slate-900/30 backdrop-blur-2xl border-b border-slate-700/50">
+        <div className="container-padding max-w-7xl mx-auto py-6">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Browse Opportunities</h1>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition"
-            >
-              <FiFilter /> Filters
-            </button>
+            <div>
+              <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                Browse Opportunities
+              </h1>
+              <p className="text-slate-400 mt-2">Find tasks near you • Post your own • Get started</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsMapView(true)}
+                className="hidden md:flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition"
+              >
+                <FiMap size={20} /> Map View
+              </button>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="md:hidden flex items-center gap-2 px-4 py-3 bg-slate-800 text-white rounded-xl border border-slate-700 hover:border-purple-500 transition"
+              >
+                <FiFilter /> Filters
+              </button>
+            </div>
           </div>
 
           {/* Search Bar */}
           <div className="relative">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
             <input
               type="text"
               placeholder="Search needs by title or description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none transition bg-gray-50"
+              className="input-base w-full pl-12 pr-4"
             />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="container-padding max-w-7xl mx-auto py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-            <div className="bg-white rounded-xl border-2 border-gray-200 p-6 space-y-6 sticky top-24">
+            <div className="card sticky top-32 space-y-6">
               <div className="flex items-center justify-between lg:hidden mb-4">
-                <h3 className="font-bold text-gray-900">Filters</h3>
+                <h3 className="font-bold text-white text-lg">Filters</h3>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
+                  className="p-1 hover:bg-slate-700/50 rounded-lg transition"
                 >
                   <FiX />
                 </button>
               </div>
 
+              {/* Map Toggle Mobile */}
+              <button
+                onClick={() => setIsMapView(true)}
+                className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-cyan-500/30 transition"
+              >
+                <FiMap size={18} /> Map View
+              </button>
+
               {/* Category Filter */}
               <div>
-                <h3 className="font-bold text-gray-900 mb-3">Category</h3>
+                <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                  Category
+                </h3>
                 <div className="space-y-2">
                   {categories.map((cat) => (
                     <label key={cat} className="flex items-center gap-3 cursor-pointer group">
@@ -152,17 +202,17 @@ export default function Browse() {
                         value={cat}
                         checked={selectedCategory === cat}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-4 h-4 accent-primary"
+                        className="w-4 h-4 accent-purple-600"
                       />
-                      <span className="text-gray-700 group-hover:text-primary transition">{cat}</span>
+                      <span className="text-slate-300 group-hover:text-purple-300 transition">{cat}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               {/* Location Filter */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="font-bold text-gray-900 mb-3">Location</h3>
+              <div className="border-t border-slate-700/50 pt-6">
+                <h3 className="font-bold text-white mb-4">Location</h3>
                 <div className="space-y-2">
                   {locations.map((loc) => (
                     <label key={loc} className="flex items-center gap-3 cursor-pointer group">
@@ -172,21 +222,21 @@ export default function Browse() {
                         value={loc}
                         checked={selectedLocation === loc}
                         onChange={(e) => setSelectedLocation(e.target.value)}
-                        className="w-4 h-4 accent-primary"
+                        className="w-4 h-4 accent-purple-600"
                       />
-                      <span className="text-gray-700 group-hover:text-primary transition">{loc}</span>
+                      <span className="text-slate-300 group-hover:text-purple-300 transition">{loc}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               {/* Sort Options */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="font-bold text-gray-900 mb-3">Sort By</h3>
+              <div className="border-t border-slate-700/50 pt-6">
+                <h3 className="font-bold text-white mb-4">Sort By</h3>
                 <select
                   value={selectedSort}
                   onChange={(e) => setSelectedSort(e.target.value)}
-                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition"
+                  className="input-base w-full"
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -204,7 +254,7 @@ export default function Browse() {
                   setSelectedLocation('All');
                   setSelectedSort('newest');
                 }}
-                className="w-full py-2 border-2 border-primary text-primary font-medium rounded-lg hover:bg-primary hover:text-white transition"
+                className="w-full py-3 border border-slate-700 text-slate-300 font-semibold rounded-xl hover:bg-slate-800/50 hover:border-purple-500 transition"
               >
                 Reset Filters
               </button>
@@ -216,13 +266,13 @@ export default function Browse() {
             {loading ? (
               <div className="flex items-center justify-center h-64">
                 <div className="animate-spin">
-                  <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full"></div>
+                  <div className="w-12 h-12 border-4 border-slate-700 border-t-purple-500 rounded-full"></div>
                 </div>
               </div>
             ) : filteredNeeds.length > 0 ? (
               <>
-                <div className="mb-4 text-gray-600">
-                  Showing <span className="font-bold text-gray-900">{filteredNeeds.length}</span> opportunities
+                <div className="mb-6 text-slate-300 font-semibold">
+                  Showing <span className="text-purple-300">{filteredNeeds.length}</span> {filteredNeeds.length === 1 ? 'opportunity' : 'opportunities'}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredNeeds.map((need) => (
@@ -233,17 +283,17 @@ export default function Browse() {
                 </div>
               </>
             ) : (
-              <div className="bg-white rounded-xl border-2 border-gray-200 p-12 text-center">
-                <div className="text-5xl mb-4">🔍</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">No opportunities found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your filters or search term</p>
+              <div className="card text-center py-16">
+                <div className="text-6xl mb-6">🔍</div>
+                <h3 className="text-3xl font-bold text-white mb-3">No opportunities found</h3>
+                <p className="text-slate-400 mb-8 text-lg">Try adjusting your filters or search term</p>
                 <button
                   onClick={() => {
                     setSearchTerm('');
                     setSelectedCategory('All');
                     setSelectedLocation('All');
                   }}
-                  className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition"
+                  className="btn-primary"
                 >
                   Clear Filters
                 </button>
