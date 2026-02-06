@@ -7,13 +7,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental: {
-    isrMemoryCacheSize: 0,
-  },
-  onDemandEntries: {
-    maxInactiveAge: 15 * 60 * 1000,
-    pagesBufferLength: 2,
-  },
   images: {
     remotePatterns: [
       {
@@ -29,8 +22,7 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
   },
-  staticPageGenerationTimeout: 1000,
-  skipStaticOptimization: true,
+  staticPageGenerationTimeout: 120,
 };
 
 module.exports = nextConfig;
