@@ -74,7 +74,7 @@ export default function RegisterPage() {
         full_name: formData.full_name,
         email: formData.email,
         username: formData.username,
-        password: formData.password,
+        password: formData.password.slice(0, 72), // Bcrypt limit: 72 bytes
       });
       toast.success('Account created successfully!');
       router.push('/browse');
