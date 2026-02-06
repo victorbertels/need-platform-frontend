@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import toast from 'react-hot-toast';
-import { FiStar, FiMapPin, FiMailIcon, FiEdit, FiPhone, FiCalendar } from 'react-icons/fi';
+import { FiStar, FiMapPin, FiMail, FiEdit, FiPhone, FiCalendar } from 'react-icons/fi';
 import { formatDate } from '@/lib/utils';
 
 interface UserProfile {
@@ -179,7 +179,7 @@ export default function ProfilePage() {
                       href={`/messages?user=${profile.id}`}
                       className="btn-primary flex items-center gap-2"
                     >
-                      <FiMailIcon /> Message
+                      <FiMail /> Message
                     </Link>
                     <button className="btn-secondary">Hire</button>
                   </>

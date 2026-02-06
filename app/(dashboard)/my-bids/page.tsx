@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import toast from 'react-hot-toast';
 import { FiExternalLink, FiTrash2 } from 'react-icons/fi';
-import { formatDate, formatCurrency } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 
 interface Bid {
   id: string;
