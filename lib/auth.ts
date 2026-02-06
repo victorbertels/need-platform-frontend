@@ -123,5 +123,5 @@ export const useAuthStore = create<AuthStore>((set, get) => {
   getToken: () => {
     return get().token;
   },
-  };
+};
 }));
