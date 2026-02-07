@@ -44,6 +44,15 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            
+            {user && (
+              <Link
+                href="/post-need"
+                className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:from-purple-500 hover:to-pink-500 hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+              >
+                ➕ Post Need
+              </Link>
+            )}
           </div>
 
           {/* Auth Buttons */}

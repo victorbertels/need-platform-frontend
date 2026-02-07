@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import '@/styles/globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import PostNeedFAB from '@/components/PostNeedFAB';
 
 export const metadata: Metadata = {
   title: 'Need - Whatever You NEED',
@@ -26,6 +27,7 @@ export default function RootLayout({
         <main className="flex-grow">
           {children}
         </main>
+        <PostNeedFAB />
         <Footer />
         <Toaster
           position="bottom-right"

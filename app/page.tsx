@@ -48,7 +48,7 @@ export default function Home() {
               </p>
 
               {/* CTA Section */}
-              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8">
+              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-12">
                 <input
                   type="email"
                   placeholder="your@email.com"
@@ -65,9 +65,19 @@ export default function Home() {
                 </button>
               </div>
 
-              <p className="text-slate-400 text-sm">
+              <p className="text-slate-400 text-sm mb-12">
                 ✓ Free to sign up • No credit card required • Join 500+ professionals
               </p>
+
+              {/* Post a Need CTA - Very Prominent */}
+              <div className="mb-20">
+                <p className="text-center text-slate-400 text-sm mb-4">Already signed in?</p>
+                <Link href="/post-need" className="inline-flex w-full sm:w-auto justify-center">
+                  <div className="px-12 py-5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl font-black text-xl hover:from-green-400 hover:to-emerald-400 hover:shadow-2xl hover:shadow-green-500/50 transition-all shadow-xl">
+                    ➕ POST A NEED NOW
+                  </div>
+                </Link>
+              </div>
             </div>
 
             {/* Hero Image */}
