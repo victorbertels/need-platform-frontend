@@ -90,9 +90,10 @@ export default function NeedDetailPage() {
 
     try {
       setSubmittingBid(true);
-      await api.post(`/needs/${params.id}/bids`, {
+      await api.post("/bids", {
+        need_id: params.id,
         amount: parseFloat(bidAmount),
-        description: bidDescription
+        message: bidDescription
       });
       
       toast.success('Bid submitted successfully!');
