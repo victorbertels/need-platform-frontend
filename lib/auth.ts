@@ -37,22 +37,9 @@ interface AuthStore {
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => {
-  // Initialize safely - only on client side
-  let initialUser = null;
-  let initialToken = null;
-  
-  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-    try {
-      initialUser = JSON.parse(localStorage.getItem('user') || 'null');
-      initialToken = localStorage.getItem('token');
-    } catch (e) {
-      // Silent fail on SSR
-    }
-  }
-  
   return {
-    user: initialUser,
-    token: initialToken,
+    user: null,
+    token: null,
     isLoading: false,
     error: null,
 

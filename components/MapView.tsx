@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { FiMap, FiGrid3X3, FiFilter } from 'react-icons/fi';
+import { FiMap, FiGrid, FiFilter } from 'react-icons/fi';
 
 // Dynamically import Leaflet to avoid SSR issues
 const Map = dynamic(() => import('./Map'), { ssr: false });
@@ -114,7 +114,7 @@ export default function MapView({
           onClick={onToggleView}
           className="glass px-4 py-3 rounded-xl font-semibold flex items-center gap-2 hover:bg-slate-700/50 transition"
         >
-          <FiGrid3X3 /> Grid View
+          <FiGrid /> Grid View
         </button>
 
         {/* Distance Filter */}
