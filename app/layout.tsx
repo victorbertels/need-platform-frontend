@@ -5,8 +5,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PostNeedFAB from '@/components/PostNeedFAB';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Need - Whatever You NEED',
   description: 'Find local help and services in Belgium. Post a need, get bids, choose the perfect person.',
