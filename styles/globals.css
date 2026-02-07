@@ -24,7 +24,7 @@ html {
 }
 
 body {
-  @apply bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white;
+  @apply bg-gradient-to-br from-slate-900 via-purple-800 to-cyan-900 text-white;
   font-family: 'Geist', 'Space Grotesk', sans-serif;
   background-attachment: fixed;
 }
@@ -45,7 +45,7 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gradient-to-b from-purple-500 to-pink-500 rounded-full hover:from-purple-400 hover:to-pink-400;
+  @apply bg-gradient-to-b from-cyan-500 via-purple-500 to-pink-500 rounded-full hover:from-cyan-400 hover:via-purple-400 hover:to-pink-400;
 }
 
 /* Form inputs */
@@ -75,7 +75,7 @@ a {
   }
 
   .card-gradient {
-    @apply bg-gradient-to-br from-slate-800/60 to-purple-900/20 backdrop-blur-xl rounded-3xl shadow-2xl transition-all p-8 border border-purple-500/20 hover:border-purple-500/50;
+    @apply bg-gradient-to-br from-slate-800/60 via-purple-900/30 to-cyan-900/20 backdrop-blur-xl rounded-3xl shadow-2xl transition-all p-8 border border-cyan-500/20 hover:border-cyan-500/50;
   }
 
   .container-padding {

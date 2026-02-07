@@ -1,0 +1,13 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="neon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="200" height="200" fill="#0f172a" rx="20"/>
+  <!-- N Letter -->
+  <text x="100" y="140" font-family="Space Grotesk, -apple-system, sans-serif" font-size="120" font-weight="900" fill="url(#neon)" text-anchor="middle" dominant-baseline="middle">N</text>
+</svg>

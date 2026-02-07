@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: 'Need - Whatever You NEED',
   description: 'Find local help and services in Belgium. Post a need, get bids, choose the perfect person.',
   viewport: 'width=device-width, initial-scale=1',
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -24,7 +28,7 @@ export default function RootLayout({
         <meta charSet="utf-8" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="flex flex-col min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
+      <body className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900">
         <Navbar />
         <main className="flex-grow">
           {children}
