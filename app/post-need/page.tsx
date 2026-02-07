@@ -105,8 +105,7 @@ export default function PostNeedPage() {
         category: formData.category,
         starting_bid: budget,
         location: formData.location,
-        deadline: formData.deadline || null,
-        status: 'Active',
+        auction_end: formData.deadline ? new Date(formData.deadline).toISOString() : null,
       });
 
       toast.success('Need posted successfully! 🎉');
